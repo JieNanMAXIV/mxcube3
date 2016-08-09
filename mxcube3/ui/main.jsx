@@ -11,15 +11,13 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createLogger from 'redux-logger';
 import thunk from 'redux-thunk';
-import { persistStore, autoRehydrate } from 'redux-persist';
-import crosstabSync from 'redux-persist-crosstab';
 import rootReducer from './reducers';
 import ServerIO from './serverIO';
 import 'font-awesome-webpack';
 import { getLoginInfo } from './actions/login';
 require('file?name=[name].[ext]!index.html');
 
-const store = createStore(rootReducer, applyMiddleware(thunk, createLogger()), autoRehydrate());
+const store = createStore(rootReducer, applyMiddleware(thunk, createLogger()));
 
 if (module.hot) {
   // Enable Webpack hot module replacement for reducers
@@ -35,29 +33,15 @@ function requireAuth(nextState, replace) {
   }
 }
 
-
 export default class App extends React.Component {
-  state = {
-    initialized: false
-  }
 
   componentWillMount() {
     this.serverIO = new ServerIO(store.dispatch);
     this.serverIO.listen();
-
-    const persistor = persistStore(store,
-      { blacklist: ['beamline', 'form', 'login', 'sampleview', 'general', 'logger'] }, () => {
-        store.dispatch(getLoginInfo());
-        this.setState({ initialized: true });
-      }
-    );
-
-    crosstabSync(persistor);
+    store.dispatch(getLoginInfo());
   }
 
   render() {
-    if (! this.state.initialized) return <span>Loading...</span>;
-
     return (<Provider store={store}>
             <Router>
               <Route path="/" component={Main} onEnter={requireAuth}>

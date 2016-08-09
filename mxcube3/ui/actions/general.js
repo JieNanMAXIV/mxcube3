@@ -89,6 +89,14 @@ export function getInitialStatus() {
         'Content-type': 'application/json'
       }
     });
+    const restoreQueue = fetch('mxcube/api/v0.1/queue', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-type': 'application/json'
+      }
+    });
 
     const pchains = [
       motors.then(parse).then(json => { state.Motors = json; }).catch(notify),
@@ -97,7 +105,8 @@ export function getInitialStatus() {
       diffractometerInfo.then(parse).then(json => { Object.assign(state, json); }).catch(notify),
       dataPath.then(parse).then(path => { state.rootPath = path; }).catch(notify),
       dcParameters.then(parse).then(json => { state.dcParameters = json; }).catch(notify),
-      savedPoints.then(parse).then(json => { state.points = json; }).catch(notify)
+      savedPoints.then(parse).then(json => { state.points = json; }).catch(notify),
+      restoreQueue.then(parse).then(json => { state.queue = json; }).catch(notify)
     ];
 
     Promise.all(pchains).then(() => {

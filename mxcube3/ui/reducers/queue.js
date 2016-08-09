@@ -324,8 +324,35 @@ export default (state = initialState, action) => {
       }
     case 'SET_INITIAL_STATUS':
       {
-        return { ...state, rootPath: action.data.rootPath,
-                           manualMount: { set: state.manualMount.set, id: 0 } };
+        const queue = {};
+        const sampleList = {};
+        const history = { nodes: [], collapsed: false };
+        const lookup = {};
+        const lookup_queueID = {};
+        for (const sample in action.data.queue) {
+          history.nodes = history.nodes.concat(action.data.queue[sample].QueueId);
+          lookup[action.data.queue[sample].QueueId] = sample;
+          lookup_queueID[sample] = action.data.queue[sample].QueueId;
+          if (action.data.queue.hasOwnProperty(sample)) {
+            queue[action.data.queue[sample].QueueId] = action.data.queue[sample].methods;
+            sampleList[sample] = {
+              id: action.data.queue[sample].SampleId,
+              location: 'Manual',
+              proteinAcronym: 'asdad',
+              sampleName: 'sdgs'
+            };
+          }
+        }
+        return {
+          ...state,
+          rootPath: action.data.rootPath,
+          manualMount: { set: !action.data.useSC, id: 0 },
+          queue,
+          sampleList,
+          history,
+          lookup,
+          lookup_queueID
+        };
       }
     default:
       return state;

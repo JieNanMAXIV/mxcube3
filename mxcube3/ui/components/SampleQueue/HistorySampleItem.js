@@ -21,7 +21,7 @@ export default class HistorySampleItem extends React.Component {
     return (
       <div className={taskClass} key={key}>
         <span className="node-name">
-          {node.parameters.point !== -1 ? `P ${node.parameters.point} ` : ' '} {node.label}
+          {node.Params.point !== -1 ? `P ${node.Params.point} ` : ' '} {node.label}
         </span>
       </div>
     );
