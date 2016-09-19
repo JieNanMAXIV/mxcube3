@@ -169,7 +169,7 @@ def execute_entry_with_id(sid, tindex):
 
     socketio.emit('Queue', msg, namespace='/hwr')
 
-    logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
+    #logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
 
     return Response(status=200)
 
@@ -177,7 +177,7 @@ def execute_entry_with_id(sid, tindex):
 @mxcube.route("/mxcube/api/v0.1/queue", methods=['POST'])
 def queue_add_item():
      qutils.queue_add_item(request.get_json())
-     logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
+     #logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
      qutils.save_queue(session)
      return Response(status=200)
 
@@ -222,7 +222,7 @@ def queue_delete_item(sid, tindex):
 
     qutils.delete_entry(entry)
 
-    logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
+    #logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
     qutils.save_queue(session)
     return Response(status=200)
 
@@ -230,7 +230,7 @@ def queue_delete_item(sid, tindex):
 @mxcube.route("/mxcube/api/v0.1/queue/<sid>/<ti1>/<ti2>/swap", methods=['POST'])
 def queue_swap_task_item(sid, ti1, ti2):
     qutils.swap_task_entry(sid, int(ti1), int(ti2))
-    logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
+    #logging.getLogger('HWR').info('[QUEUE] is:\n%s ' % qutils.queue_to_json())
     qutils.save_queue(session)
     return Response(status=200) 
    
