@@ -1,6 +1,6 @@
 import './SampleView.css';
 import React from 'react';
-import { makePoints, makeImageOverlay } from './shapes';
+import { makePoints, makeLines, makeImageOverlay } from './shapes';
 import SampleControls from './SampleControls';
 import 'fabric';
 const fabric = window.fabric;
@@ -28,10 +28,13 @@ export default class SampleImage extends React.Component {
     // Bind mouse double click to function manually with javascript
     imageOverlay.addEventListener('dblclick', (e) => this.goToBeam(e), false);
 
+
+
     this.setImageRatio();
 
     // Add so that the canvas will resize if the window changes size
     window.addEventListener('resize', this.setImageRatio);
+
   }
 
   componentWillReceiveProps(nextProps) {
@@ -80,6 +83,7 @@ export default class SampleImage extends React.Component {
   }
 
   rightClick(e) {
+    const group = this.canvas.getActiveGroup(); 
     const { sampleActions, contextMenuShow } = this.props;
     const { showContextMenu } = sampleActions;
     let objectFound = false;
@@ -88,13 +92,19 @@ export default class SampleImage extends React.Component {
     if (contextMenuShow) {
       showContextMenu(false);
     }
+
     this.canvas.forEachObject((obj) => {
       if (!objectFound && obj.containsPoint(clickPoint) && obj.selectable) {
         objectFound = true;
         showContextMenu(true, obj, obj.left, obj.top);
       }
     });
-    if (!objectFound) {
+
+    if (group && group.containsPoint(clickPoint) && group.getObjects().length === 2) {
+      console.log(group.getObjects())
+      const points = group.getObjects();
+      showContextMenu(true, { type: 'GROUP', p1: points[0].id, p2: points[1].id }, e.offsetX, e.offsetY);
+    } else if (!objectFound) {
       showContextMenu(true, { type: 'NONE' }, e.offsetX, e.offsetY);
     }
   }
@@ -147,7 +157,6 @@ export default class SampleImage extends React.Component {
     }
   }
 
-
   renderSampleView(nextProps) {
     const {
       imageRatio,
@@ -157,7 +166,9 @@ export default class SampleImage extends React.Component {
       clickCentringPoints,
       distancePoints,
       points,
-      pixelsPerMm
+      lines,
+      pixelsPerMm,
+      selection
     } = nextProps.sampleViewState;
     this.drawCanvas(imageRatio);
     this.canvas.add(...makeImageOverlay(
@@ -171,10 +182,12 @@ export default class SampleImage extends React.Component {
       this.canvas
     ));
     this.canvas.add(...makePoints(points, imageRatio));
+    this.canvas.add(...makeLines(lines, points, imageRatio));
   }
 
 
   render() {
+    console.log("render sampleview");
     return (
       <div>
         <div className="outsideWrapper" id="outsideWrapper">

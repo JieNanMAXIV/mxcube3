@@ -64,8 +64,7 @@ function mapStateToProps(state) {
     sampleInformation: state.queue.sampleList,
     sampleViewState: state.sampleview,
     beamline: state.beamline,
-    defaultParameters: state.taskForm.defaultParameters,
-    logMessages: state.logger.logRecords
+    defaultParameters: state.taskForm.defaultParameters
   };
 }
 
