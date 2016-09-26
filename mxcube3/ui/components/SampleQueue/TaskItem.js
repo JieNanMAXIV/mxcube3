@@ -112,7 +112,6 @@ export default class TaskItem extends Component {
   }
 
   render() {
-    console.log("render taskitem");
     const { state,
             data,
             isDragging,

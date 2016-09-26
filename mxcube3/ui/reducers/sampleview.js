@@ -21,7 +21,6 @@ const initialState = {
   },
   pixelsPerMm: 0,
   imageRatio: 0,
-  contextMenu: { show: false, shape: { type: 'NONE' }, x: 0, y: 0 },
   apertureList: [],
   currentAperture: 0,
   currentPhase: '',
@@ -105,17 +104,6 @@ export default (state = initialState, action) => {
     case 'UPDATE_POINTS_POSITION':
       {
         return { ...state, points: action.points };
-      }
-    case 'SHOW_CONTEXT_MENU':
-      {
-        return {
-          ...state,
-          contextMenu: {
-            show: action.show,
-            shape: action.shape,
-            x: action.x, y: action.y
-          }
-        };
       }
     case 'SET_IMAGE_RATIO':
       {
