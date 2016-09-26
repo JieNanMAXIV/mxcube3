@@ -14,8 +14,9 @@ class Helical extends React.Component {
   handleSubmit(runNow) {
     const parameters = {
       ...this.props.values,
-      type: 'Helical',
+      type: 'DataCollection',
       typePrefix: 'L',
+      helical: true,
       point: this.props.pointId,
       p1: this.props.lines[this.props.pointId].p1,
       p2: this.props.lines[this.props.pointId].p2
@@ -31,7 +32,8 @@ class Helical extends React.Component {
       'path',
       'type',
       'point',
-      'typePrefix'
+      'typePrefix',
+      'helical'
     ];
 
     for (const key in parameters) {

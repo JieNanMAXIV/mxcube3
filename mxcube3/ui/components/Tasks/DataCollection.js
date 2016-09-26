@@ -15,6 +15,7 @@ class DataCollection extends React.Component {
     const parameters = {
       ...this.props.values,
       type: 'DataCollection',
+      helical: false,
       point: this.props.pointId,
       typePrefix: 'P',
     };
@@ -29,7 +30,8 @@ class DataCollection extends React.Component {
       'path',
       'type',
       'point',
-      'typePrefix'
+      'typePrefix',
+      'helical'
     ];
 
     for (const key in parameters) {

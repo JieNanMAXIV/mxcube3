@@ -28,13 +28,10 @@ export default class SampleImage extends React.Component {
     // Bind mouse double click to function manually with javascript
     imageOverlay.addEventListener('dblclick', (e) => this.goToBeam(e), false);
 
-
-
     this.setImageRatio();
 
     // Add so that the canvas will resize if the window changes size
     window.addEventListener('resize', this.setImageRatio);
-
   }
 
   componentWillReceiveProps(nextProps) {
@@ -57,7 +54,7 @@ export default class SampleImage extends React.Component {
     this.props.sampleActions.setImageRatio(document.getElementById('outsideWrapper').clientWidth);
   }
   goToBeam(e) {
-    const { sampleActions, imageRatio} = this.props;
+    const { sampleActions, imageRatio } = this.props;
     const { sendGoToBeam } = sampleActions;
     sendGoToBeam(e.layerX * imageRatio, e.layerY * imageRatio);
   }
@@ -71,7 +68,6 @@ export default class SampleImage extends React.Component {
     const canvasWindow = document.getElementById('canvas');
     canvasWindow.width = w;
     canvasWindow.height = h;
-
     // Set the size of the created FabricJS Canvas
     this.canvas.setDimensions({ width: w, height: h });
     this.canvas.renderAll();
@@ -85,7 +81,7 @@ export default class SampleImage extends React.Component {
 
 
   rightClick(e) {
-    const group = this.canvas.getActiveGroup(); 
+    const group = this.canvas.getActiveGroup();
     const { sampleActions } = this.props;
     const { showContextMenu } = sampleActions;
     let objectFound = false;
@@ -96,13 +92,19 @@ export default class SampleImage extends React.Component {
     this.canvas.forEachObject((obj) => {
       if (!objectFound && obj.containsPoint(clickPoint) && obj.selectable) {
         objectFound = true;
+        this.canvas.setActiveObject(obj);
         showContextMenu(true, obj, obj.left, obj.top);
       }
     });
 
     if (group && group.containsPoint(clickPoint) && group.getObjects().length === 2) {
       const points = group.getObjects();
-      showContextMenu(true, { type: 'GROUP', p1: points[0].id, p2: points[1].id }, e.offsetX, e.offsetY);
+
+      showContextMenu(true, {
+        type: 'GROUP',
+        p1: points[0].id,
+        p2: points[1].id },
+        e.offsetX, e.offsetY);
     } else if (!objectFound) {
       showContextMenu(true, { type: 'NONE' }, e.offsetX, e.offsetY);
     }
@@ -155,6 +157,8 @@ export default class SampleImage extends React.Component {
   }
 
   renderSampleView(nextProps) {
+    const group = this.canvas.getActiveGroup();
+    const selection = this.canvas.getActiveObject();
     const {
       imageRatio,
       beamPosition,
@@ -164,8 +168,7 @@ export default class SampleImage extends React.Component {
       distancePoints,
       points,
       lines,
-      pixelsPerMm,
-      selection
+      pixelsPerMm
     } = nextProps;
     this.drawCanvas(imageRatio);
     this.canvas.add(...makeImageOverlay(
@@ -178,9 +181,32 @@ export default class SampleImage extends React.Component {
       distancePoints,
       this.canvas
     ));
-    this.canvas.add(...makePoints(points, imageRatio));
-    this.canvas.add(...makeLines(lines, points, imageRatio));
-    //this.canvas.add(new fabric.Group(...makePoints(points, imageRatio)));
+    const fabricSelectables = [...makePoints(points, imageRatio), ...makeLines(lines, points, imageRatio)];
+    this.canvas.add(...fabricSelectables);
+    if (group) {
+      const groupIDs = group.getObjects().map((shape) => shape.id);
+      const selectedShapes = [];
+      fabricSelectables.forEach((shape) => {
+        if (groupIDs.includes(shape.id)) {
+          selectedShapes.push(shape);
+        }
+      });
+      this.canvas.setActiveGroup(
+        new fabric.Group(
+          selectedShapes,
+          {
+            originX: 'center',
+            originY: 'center'
+          })
+      );
+
+    } else if (selection) {
+      fabricSelectables.forEach((shape) => {
+        if (shape.id === selection.id) {
+          this.canvas.setActiveObject(shape);
+        }
+      });
+    }
   }
 
 

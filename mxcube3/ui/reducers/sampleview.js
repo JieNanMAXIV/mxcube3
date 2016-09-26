@@ -62,7 +62,7 @@ export default (state = initialState, action) => {
       }
     case 'ADD_LINE':
       {
-        return { ...state, lines: [ ...state.lines, { p1: action.p1, p2: action.p2 } ] };
+        return { ...state, lines: [...state.lines, { p1: action.p1, p2: action.p2 }] };
       }
     case 'MEASURE_DISTANCE':
       {
@@ -86,7 +86,9 @@ export default (state = initialState, action) => {
       }
     case 'DELETE_LINE':
       {
-        return { ...state, lines: [...state.lines.slice(0, action.id), ...state.lines.slice(action.id + 1)] };
+        return { ...state,
+          lines: [...state.lines.slice(0, action.id), ...state.lines.slice(action.id + 1)]
+        };
       }
     case 'DELETE_POINT':
       {
@@ -132,7 +134,7 @@ export default (state = initialState, action) => {
       }
     case 'UNMOUNT_SAMPLE':
       {
-        return { ...state, points: {} , lines: [] };
+        return { ...state, points: {}, lines: [] };
       }
     case 'SET_STEP_SIZE':
       {
@@ -147,7 +149,10 @@ export default (state = initialState, action) => {
       }
     case 'CLEAR_ALL':
       {
-        return Object.assign({}, state, { lines: [], points: {}, distancePoints: [], clickCentringPoints: [] });
+        return Object.assign({},
+          state,
+          { lines: [], points: {}, distancePoints: [], clickCentringPoints: [] }
+        );
       }
     case 'SET_INITIAL_STATUS':
       {
