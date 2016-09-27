@@ -8,6 +8,7 @@ import Utils
 
 import queue_model_objects_v1 as qmo
 import queue_entry as qe
+import queue_model_enumerables_v1 as qme
 
 from flask import jsonify
 from mock import Mock
@@ -341,7 +342,6 @@ def set_dc_params(model, entry, task_data):
     """
     acq = model.acquisitions[0]
     params = task_data['parameters']
-
     acq.acquisition_parameters.set_from_dict(params)
     acq.path_template.set_from_dict(params)
 
@@ -349,6 +349,11 @@ def set_dc_params(model, entry, task_data):
                              params.get('path', 'dummy_path'))
 
     acq.path_template.directory = full_path
+    acq.path_template.base_prefix = params['prefix']
+
+    process_path = os.path.join(mxcube.session.get_base_process_directory(),
+                             params.get('path', 'dummy_path'))
+    acq.path_template.process_directory = process_path
 
     # If there is a centered position associated with this data collection, get
     # the necessary data for the position and pass it to the collection.
@@ -360,21 +365,21 @@ def set_dc_params(model, entry, task_data):
                 acq.acquisition_parameters.centred_position = _cpos
 
     if params["helical"]:
-        model.experiment_type = qmo.EXPERIMENT_TYPE.HELICAL
+        model.experiment_type = qme.EXPERIMENT_TYPE.HELICAL
         if int(params["p1"]) > 0:
             for cpos in mxcube.diffractometer.savedCentredPos:
-                if cpos['posId'] == int(params['point']):
+                if cpos['posId'] == int(params['p1']):
                     _cpos = qmo.CentredPosition(cpos['motor_positions'])
-                    _cpos.index = int(params['point'])
+                    _cpos.index = int(params['p1'])
                     acq.acquisition_parameters.centred_position = _cpos
         if int(params["p2"]) > 0:
-            acq2 = model.acquisitions[1]
+            acq2 = qmo.Acquisition()
             for cpos in mxcube.diffractometer.savedCentredPos:
-                if cpos['posId'] == int(params['point']):
+                if cpos['posId'] == int(params['p2']):
                     _cpos = qmo.CentredPosition(cpos['motor_positions'])
-                    _cpos.index = int(params['point'])
+                    _cpos.index = int(params['p2'])
                     acq2.acquisition_parameters.centred_position = _cpos
-
+            model.acquisitions.append(acq2)
 
     model.set_enabled(task_data['checked'])
     entry.set_enabled(task_data['checked'])
